@@ -3,18 +3,20 @@ function init(){
 		loginForm : document.getElementById('login-form'),
 		inputName : document.getElementById('inputName'),
 		inputPass : document.getElementById('inputPass'),
-		inputAuthority : {},
-		inputId:{},
 		signBtn : document.getElementById('signBtn'),
 		checkBox : document.getElementById('checkbox-box'),
+		inputAuthority : '',
+		
 		title : document.getElementById('title'),
 		users : [],
 
 		bindEvents : function  () {
-			loginApp.addUser(loginApp.getUser());
+			
 			loginApp.loginForm.addEventListener('submit',function  (event) {
 				event.preventDefault();
-				loginApp.checkUser();
+				var user = loginApp.getUser();
+				loginApp.addUser(user);
+				loginApp.checkUser(user);
 			})	
 		},
 
@@ -30,27 +32,26 @@ function init(){
 			return user;
 		},
 
-		checkUser : function  () {
-			for (var i = 0; i < loginApp.users.length ; i++) {
-				if (loginApp.inputName.value == loginApp.users[i].name && loginApp.inputPass.value == loginApp.users[i].pass) {
-					loginApp.loginForm.removeChild(loginApp.loginForm.childNodes[5]);
-					switch(loginApp.users[i].authority) {
-					 		case 'admin':
-					 			loginApp.adminPanel(loginApp.users[i]);
-					 			return;
-					 			break;
-					 		default:
-					 			loginApp.showStartPage(loginApp.users[i]);
-					 			return;
-					 			break;
-					 }; 	
-				};
-			};
-			loginApp.showErrorMessage(loginApp.inputName.value);
+		checkUser : function  (user) {
+			if (loginApp.inputName.value == user.name && loginApp.inputPass.value == user.pass) {
+				loginApp.loginForm.removeChild(loginApp.loginForm.childNodes[5]);
+				switch(user.authority) {
+				 		case 'admin':
+				 			loginApp.adminPanel();
+				 			// loginApp.showAllUsers();
+				 			break;
+				 		default:
+				 			loginApp.showStartPage(user);
+				 			break;
+				 } 	
+			}
+			else{
+				loginApp.showErrorMessage(user);
+			 };
 		},
 
-		adminPanel: function  (user) {
-			loginApp.title.innerHTML = "Hello, " + user.name+ "! Enter NEW user details";
+		adminPanel: function  () {
+			loginApp.title.innerHTML = "Enter NEW user is, name, pass, authority:";
 			var inputIDGroup = loginApp.loginForm.childNodes[1].cloneNode(true);
 			inputIDGroup.childNodes[1].innerHTML = 'ID';
 			inputIDGroup.childNodes[1].setAttribute('for','Id')
@@ -71,13 +72,13 @@ function init(){
 			var addUserBtn = document.createElement('a');
 			var showAllUsersBtn = document.createElement('a');
 			addUserBtn.setAttribute('class','btn btn-primary');
-			addUserBtn.setAttribute('id','addUserBtn');
+			addUserBtn.setAttribute('is','addUserBtn');
 			addUserBtn.innerHTML = "Add User";
 			addUserBtn.style.marginRight='10px';
 			loginApp.signBtn.parentNode.appendChild(addUserBtn);
 			addUserBtn.addEventListener('click', function  () {
 				
-				var id = loginApp.inputId.value; 
+				var id = loginApp.inputId.value; // почему я не могу обратиться к loginApp.inpuId.value ??
 				var name = loginApp.inputName.value;
 				var pass = loginApp.inputPass.value;
 				var authority = loginApp.inputAuthority.value;
@@ -87,10 +88,11 @@ function init(){
 			} )
 
 			showAllUsersBtn.setAttribute('class','btn btn-primary');
-			showAllUsersBtn.setAttribute('id','showAllUsersBtn');
+			showAllUsersBtn.setAttribute('is','showAllUsersBtn');
 			showAllUsersBtn.innerHTML = "Show All Users";
 			loginApp.signBtn.parentNode.appendChild(showAllUsersBtn);
 			showAllUsersBtn.addEventListener('click',loginApp.showAllUsers)
+
 			loginApp.signBtn.parentNode.removeChild(loginApp.signBtn);
 		},
 
@@ -151,7 +153,6 @@ function init(){
 			})
 			panel.appendChild(backToAddUserBtn);
 
-
 			var backToLoginBtn = document.createElement('a');
 			backToLoginBtn.setAttribute('class','btn btn-primary');
 			backToLoginBtn.innerHTML = 'Back to Login';
@@ -160,21 +161,14 @@ function init(){
 				panel.removeChild(usersTabel);
 				panel.removeChild(backToLoginBtn);
 				panel.removeChild(backToAddUserBtn);
-
+				// var iID = document.getElementById('#inpuId');
+				// console.log(iID.parentNode);
+				// console.log(iID.parentNode.parentNode);
+				// loginApp.loginForm.removeChild(loginApp.inpuId.parentNode.parentNode);
+				// loginApp.loginForm.removeChild(loginApp.inputAuthority.parentNode.parentNode);
+				// loginApp.loginForm.insertAfter(loginApp.checkBox,loginApp.inputPass.parentNode.parentNode);
 				panel.appendChild(loginApp.loginForm);
-				loginApp.loginForm.removeChild(loginApp.inputAuthority.parentNode.parentNode);
-				loginApp.loginForm.removeChild(loginApp.inputId.parentNode.parentNode);
-				loginApp.checkBox.style.marginBottom = '10px';
-				loginApp.loginForm.insertBefore(loginApp.checkBox, loginApp.loginForm.childNodes[6]);
-				
-				var addUserBtn = document.getElementById('addUserBtn');
-				console.log(addUserBtn);
-				addUserBtn.parentNode.appendChild(loginApp.signBtn);
-				var showAllUsersBtn = document.getElementById('showAllUsersBtn');
-				addUserBtn.parentNode.removeChild(addUserBtn);
-				showAllUsersBtn.parentNode.removeChild(showAllUsersBtn);
-				// loginApp.bindEvents();
-				
+				loginApp.bindEvents();
 
 
 			})
@@ -183,18 +177,22 @@ function init(){
 
 		},
 
-		showStartPage : function  (user) {
+		showStartPage : function  () {
 			loginApp.loginForm.parentNode.removeChild(loginApp.loginForm);
-			loginApp.title.innerHTML = "Hello, " + user.name + "! What's up?";
 		},
 
-		showErrorMessage : function  (name) {
-			loginApp.title.innerHTML = "Dear, " + name + "! Please recheck you pass and user name."
+		showErrorMessage : function  () {
+			
 		}
 
 	};
-
 loginApp.bindEvents();
+	
+
+
+
+
+
 
 };
 
